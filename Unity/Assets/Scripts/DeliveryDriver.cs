@@ -59,7 +59,7 @@ public class DeliveryDriver : MonoBehaviour
         {
             if(isMoving)
             {
-
+                StopMoving();
             }
             return;
         }

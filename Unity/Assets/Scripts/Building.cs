@@ -20,23 +20,34 @@ public class Building : MonoBehaviour
 
     public BuildingEvents buildingEvents;
 
+    private DeliveryOrderSystem orderSystem;
+
     void HandleDriverService(DeliveryDriver driver)
     {
         switch (BuildingType)
             {
             case BuildingType.Restaurant:
-                Debug.Log($"{buildingName}에서 음식을 픽업 했습니다.");
+                if(orderSystem != null)
+                {
+                    orderSystem.OnDriverEnteredRestarant(this);
+                }
+                
                 break;
             case BuildingType.Coustomer:
-                Debug.Log($"{buildingName}에서 배달 완료");
+                if(orderSystem != null)
+                {
+                    orderSystem.OnDriverEnteredCustomer(this);
+                }
+                
                 driver.CompleteDelivery();
                 break;
             case BuildingType.ChargingStation:
-                Debug.Log($"{buildingName}에서 배터리를 충전 했습니다.");
+                
                 driver.ChargeBattery();
                 break;
 
             }
+        buildingEvents.OnServiceUsed?.Invoke(BuildingType);
     }
 
     void OnTriggerEnter(Collider other)
@@ -59,10 +70,29 @@ public class Building : MonoBehaviour
         }
     }
 
+    void CreateNameTag()
+    {
+        GameObject nameTag = new GameObject("NameTag");
+        nameTag.transform.SetParent(this.transform);
+        nameTag.transform.localPosition = Vector3.up * 1.5f;
+        
+        TextMesh textMesh = nameTag.AddComponent<TextMesh>();
+        textMesh.text = buildingName;
+        textMesh.fontSize = 20;
+        textMesh.characterSize = 0.2f;
+        
+        textMesh.anchor = TextAnchor.MiddleCenter;
+        textMesh.color = Color.white;
+        // 항상 카메라를 향하도록 설정
+        nameTag.AddComponent<Bildboard>();
+    }
+
     // Start is called before the first frame update
     void Start()
     {
         SetupBuilding();
+        orderSystem = FindObjectOfType<DeliveryOrderSystem>();
+        CreateNameTag();
     }
 
     void SetupBuilding()
@@ -75,15 +105,15 @@ public class Building : MonoBehaviour
             {
                 case BuildingType.Restaurant:
                     mat.color = Color.red;
-                    buildingName = "음식점";
+                    
                     break;
                 case BuildingType.Coustomer:
                     mat.color = Color.green;
-                    buildingName = "고객 집";
+                    
                     break;
                 case BuildingType.ChargingStation:
                     mat.color = Color.yellow;
-                    buildingName = "충전소";
+                    
                     break;
             }
         }

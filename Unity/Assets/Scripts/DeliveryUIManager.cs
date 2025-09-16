@@ -28,6 +28,8 @@ public class DeliveryUIManager : MonoBehaviour
             driver.driverEvents.OnLowBatteryEmpty.AddListener(OnBatteryEmpty);
             driver.driverEvents.OnDeliveryCompleted.AddListener(onDeliveryCompleted);
         }
+
+        UpdateUI();
     }
 
     // Update is called once per frame
